@@ -48,6 +48,16 @@
     <label for="fileInput">GenBank file (.gbk, .gb)</label>
     <input id="fileInput" type="file" accept=".gbk,.gb,.genbank,.gbf,.txt,.fasta" />
     <div class="small">If your file contains multiple contigs, checking <em>Plot every contig</em> will create one plot per contig.</div>
+    
+    <div style="margin-top:.5rem">
+      <label for="contigRange">Contig range (optional)</label>
+      <input id="contigRange" type="text" placeholder="e.g. 1-5 or 3,7,10" />
+      <div class="small">
+        Leave empty = default (first contig or all if checked).<br>
+        Examples: <code>1-5</code>, <code>2,4,6</code>, <code>1-3,8</code>
+      </div>
+    </div>
+
   </fieldset>
 
   <fieldset>
@@ -177,6 +187,7 @@
         prefix: document.getElementById("prefix").value || "phold",
         outputDir: "phold_plots",
         allContigs: document.getElementById("allContigs").checked,
+        contigRange: document.getElementById("contigRange").value || "",
         labelHyp: document.getElementById("labelHyp").checked,
         removeOther: document.getElementById("removeOther").checked,
         plotTitle: document.getElementById("plotTitle").value || null,
@@ -586,8 +597,51 @@
         return out_map
 
     # decide contigs
-    to_plot = seqids if opts.get("allContigs") else seqids[:1]
+    def parse_range(range_str, max_len):
+        """
+        Supports:
+        - "1-5"
+        - "1,3,7"
+        - "1-3,8"
+        Returns 0-based indices
+        """
+        if not range_str:
+            return None
 
+        indices = set()
+
+        parts = range_str.split(",")
+        for part in parts:
+            part = part.strip()
+            if "-" in part:
+                start, end = part.split("-")
+                try:
+                    start = int(start)
+                    end = int(end)
+                    for i in range(start, end + 1):
+                        indices.add(i - 1)
+                except:
+                    continue
+            else:
+                try:
+                    indices.add(int(part) - 1)
+                except:
+                    continue
+
+        # filter valid range
+        return sorted(i for i in indices if 0 <= i < max_len)
+
+
+    range_str = opts.get("contigRange", "").strip()
+    parsed_indices = parse_range(range_str, len(seqids))
+
+    if parsed_indices:
+        to_plot = [seqids[i] for i in parsed_indices]
+    elif opts.get("allContigs"):
+        to_plot = seqids
+    else:
+        to_plot = seqids[:1]
+  
     # collect bytes
     out = {}
     for contig in to_plot:
