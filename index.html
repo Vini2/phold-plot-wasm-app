@@ -2,139 +2,216 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>phold_plots — Pyodide </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>phold_plots &mdash; Pyodide</title>
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem("phold-theme") || "dark";
+    } catch (error) {
+      document.documentElement.dataset.theme = "dark";
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Lexend:wght@500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 
   <!-- Pyodide -->
   <script src="https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.js"></script>
-
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      max-width: 1100px;
-      margin: 1.75rem auto;
-      padding: 0 1rem;
-      line-height: 1.45;
-    }
-    fieldset { margin: .5rem 0 1rem; padding: .75rem; border-radius:6px; }
-    label { display:block; margin: .35rem 0 .15rem; font-weight:600; }
-    input[type="text"], input[type="number"], select {
-      width: 320px; padding: .35rem; border-radius:4px; border:1px solid #ccc;
-    }
-    input[type="file"] { margin-top: .25rem; }
-    .inline { display:inline-block; margin-right:1rem; vertical-align:middle; }
-    button { margin-top: .75rem; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
-    pre { background: #f5f5f5; padding: 0.75rem; overflow-x:auto; white-space:pre-wrap; }
-    .status { font-size:0.95rem; color:#333; margin-top:.5rem; }
-    .images { display:flex; flex-wrap:wrap; gap:1rem; margin-top:1rem; }
-    .img-card { border:1px solid #ddd; padding:.5rem; border-radius:6px; width:360px;}
-    .img-card img { max-width:100%; height:auto; display:block; }
-    .small { font-size:0.9rem; color:#444; }
-  </style>
 </head>
 <body>
-  <h1>Phold Plot WebAssembly App</h1>
-
-  <p>
-    Upload a GenBank (.gbk) file from Phold, tweak your options and click <strong>Run</strong>.<br> This will run <strong>phold plot</strong>.<br>
-    For more details about the parameters, please see phold's <a href="https://phold.readthedocs.io/en/latest/run/" target="_blank">documentation</a>.<br>
-    You can also try the Example button for a pre-loaded example phage.<br>
-    
-    <strong>phold plot</strong> is run client-side using Wasm (WebAssembly) with Pyodide (Biopython + pyCirclize + matplotlib): no data leaves your machine.<br>
-    If you encounter any problems, please leave an issue on <a href="https://github.com/gbouras13/phold-plot-wasm-app" target="_blank">GitHub</a>.<br>
-  </p>
-
-  <fieldset>
-    <legend><strong>Input</strong></legend>
-    <label for="fileInput">GenBank file (.gbk, .gb)</label>
-    <input id="fileInput" type="file" accept=".gbk,.gb,.genbank,.gbf,.txt,.fasta" />
-    <div class="small">If your file contains multiple contigs, you can set the range of contigs you would like to plot below. Also, checking <em>Plot every contig</em> will create one plot per contig.</div>
-    
-    <div style="margin-top:.5rem">
-      <label for="contigRange">Contig range to plot (optional)</label>
-      <input id="contigRange" type="text" placeholder="e.g. 1-5 or 3,7,10" />
-      <div class="small">
-        Leave empty = first contig by default, or all contigs if 'Plot every contig' box below is checked.<br>
-        Three examples of how to set the range: (i) <code>1-5</code> (ii) <code>2,4,6</code> (iii) <code>1-3,8</code>
+  <div class="page-shell">
+    <header class="hero panel reveal">
+      <div class="hero-copy">
+        <h1>Phold Plot WebAssembly App</h1>
+        <p class="hero-text">
+          <strong>phold plot</strong> is run client-side using Wasm (WebAssembly) with Pyodide (Biopython + pyCirclize + matplotlib): no data leaves your machine.<br><br>
+          Upload a GenBank (.gbk) file either from <a href="https://github.com/gbouras13/pharokka" target="_blank" rel="noreferrer"><b>Pharokka</b></a>, <a href="https://github.com/gbouras13/phold" target="_blank" rel="noreferrer"><b>Phold</b></a> or <a href="https://github.com/susiegriggo/Phynteny_transformer" target="_blank" rel="noreferrer"><b>Phynteny</b></a>, tweak your options and click <strong>Run</strong>. This will run <strong>phold plot</strong>.<br>
+          For more details about the parameters, please see phold's <a href="https://phold.readthedocs.io/en/latest/run/" target="_blank" rel="noreferrer">documentation</a>.<br><br>
+          You can also try the Example button for a pre-loaded example phage.<br>
+          If you encounter any problems, please leave an issue on <a href="https://github.com/gbouras13/phold-plot-wasm-app" target="_blank" rel="noreferrer">GitHub</a>.<br>
+        </p>
       </div>
+      <div class="hero-visual" aria-label="Associated project logos">
+        <div class="hero-logo-strip">
+          <img class="hero-logo" src="https://raw.githubusercontent.com/gbouras13/pharokka/master/img/pharokka_logo.png" alt="Pharokka logo" />
+          <img class="hero-logo" src="https://raw.githubusercontent.com/gbouras13/phold/main/img/phold_logo.png" alt="Phold logo" />
+          <img class="hero-logo" src="https://raw.githubusercontent.com/susiegriggo/Phynteny_transformer/main/phynteny_logo.png" alt="Phynteny logo" />
+        </div>
+      </div>
+    </header>
+
+    <div class="page-topbar reveal">
+      <button id="themeToggle" class="btn theme-toggle" type="button" aria-pressed="false" aria-label="Switch to light mode" title="Switch to light mode">
+        <span class="theme-toggle__icon" id="themeToggleIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <path d="M12 2.5v2.2"></path>
+            <path d="M12 19.3v2.2"></path>
+            <path d="M21.5 12h-2.2"></path>
+            <path d="M4.7 12H2.5"></path>
+            <path d="M18.7 5.3l-1.6 1.6"></path>
+            <path d="M6.9 17.1l-1.6 1.6"></path>
+            <path d="M18.7 18.7l-1.6-1.6"></path>
+            <path d="M6.9 6.9L5.3 5.3"></path>
+          </svg>
+        </span>
+        <span class="sr-only">Toggle theme</span>
+      </button>
     </div>
 
-    <div style="margin-top:.5rem"></div>
-      <label class="inline"><input id="allContigs" type="checkbox" /> Plot every contig</label>
-    </div>
+    <main class="content-stack">
+      <section class="config-grid">
+        <div class="config-column">
+          <fieldset class="control-card panel reveal">
+            <legend>Input</legend>
 
-  </fieldset>
+            <div class="field-grid">
+              <div class="field-group field-group--full">
+                <label for="fileInput">GenBank file (.gbk, .gb)</label>
+                <input id="fileInput" type="file" accept=".gbk,.gb,.genbank,.gbf,.txt,.fasta" />
+                <p class="small">If your file contains multiple contigs, you can set the range of contigs you would like to plot below. Also, checking <em>Plot every contig</em> will create one plot per contig.</p>
+              </div>
 
-  <fieldset>
-    <legend><strong>Plot options</strong></legend>
+              <div class="field-group field-group--full">
+                <label for="contigRange">Contig range to plot (optional)</label>
+                <input id="contigRange" type="text" placeholder="e.g. 1-5 or 3,7,10" />
+                <p class="small">Leave empty = first contig by default, or all contigs if 'Plot every contig' box below is checked.<br>
+                Three examples of how to set the range: (i) <code>1-5</code> (ii) <code>2,4,6</code> (iii) <code>1-3,8</code></p>
+              </div>
+            </div>
 
-    <div class="inline">
-      <label for="prefix">Prefix</label>
-      <input id="prefix" type="text" value="phold" />
-    </div>
+            <div class="toggle-grid">
+              <label class="inline-toggle">
+                <input id="allContigs" type="checkbox" />
+                <span class="inline-toggle__content">
+                  <span class="inline-toggle__title">Plot every contig</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
 
-    <div style="margin-top:.5rem">
-      <label class="inline"><input id="labelHyp" type="checkbox" /> Label hypothetical proteins</label>
-      <label class="inline"><input id="removeOther" type="checkbox" /> Remove tRNA/tmRNA/CRISPR labels</label>
-    </div>
+          <fieldset class="control-card panel reveal output-card">
+            <legend>Output</legend>
 
-    <div style="margin-top:.5rem">
-      <label for="plotTitle">Plot title (optional)</label>
-      <input id="plotTitle" type="text" placeholder="(defaults to contig id)" />
-    </div>
+            <div class="format-grid">
+              <div class="field-group field-group--full">
+                <label><strong>Output format</strong></label>
+              </div>
 
-    <div style="margin-top:.5rem">
-      <label for="titleSize">Title size</label>
-      <input id="titleSize" type="number" value="20" min="6" />
-      <label style="margin-left:1rem">Label size</label>
-      <input id="labelSize" type="number" value="6.5" min="4" />
-    </div>
+              <label class="inline-toggle">
+                <input id="fmtPng" type="checkbox" checked />
+                <span class="inline-toggle__content">
+                  <span class="inline-toggle__title">PNG (.png)</span>
+                </span>
+              </label>
 
-    <div style="margin-top:.5rem">
-      <label for="interval">Axis tick interval (bp)</label>
-      <input id="interval" type="number" value="5000" />
-      <label style="margin-left:1rem">Truncate long labels to maximum this many characters</label>
-      <input id="truncate" type="number" value="20" />
-    </div>
+              <label class="inline-toggle">
+                <input id="fmtSvg" type="checkbox" />
+                <span class="inline-toggle__content">
+                  <span class="inline-toggle__title">SVG (.svg)</span>
+                </span>
+              </label>
 
-    <div style="margin-top:.5rem">
-      <label for="dpi">DPI (image quality)</label>
-      <input id="dpi" type="number" value="600" />
-      <label style="margin-left:1rem">Annotations proportion (0-1)</label>
-      <input id="annotations" type="number" min="0" max="1" step="0.05" value="1" />
-    </div>
+              <div class="field-group field-group--full">
+                <p class="small">Choose one or both. If both are selected you'll get PNG + SVG.</p>
+              </div>
+            </div>
+          </fieldset>
+        </div>
 
-    <div style="margin-top:.5rem">
-      <label for="labelIds">Label IDs (optional, newline-separated)</label>
-      <textarea id="labelIds" rows="3" style="width:640px; font-family:monospace;" placeholder="Optional list of CDS IDs to always label (one per line)"></textarea>
-    </div>
+        <fieldset class="control-card panel reveal">
+          <legend>Plot options</legend>
 
-    <!-- NEW: output format selection -->
-    <div style="margin-top:.5rem">
-      <label><strong>Output format</strong></label>
-      <label class="inline">
-        <input id="fmtPng" type="checkbox" checked /> PNG (.png)
-      </label>
-      <label class="inline" style="margin-left:1rem;">
-        <input id="fmtSvg" type="checkbox" /> SVG (.svg)
-      </label>
-      <div class="small">Choose one or both. If both are selected you'll get PNG + SVG.</div>
-    </div>
+          <div class="field-grid">
+            <div class="field-group">
+              <label for="prefix">Prefix</label>
+              <input id="prefix" type="text" value="phold" />
+            </div>
 
-  </fieldset>
+            <div class="field-group">
+              <label for="plotTitle">Plot title (optional)</label>
+              <input id="plotTitle" type="text" placeholder="(defaults to contig id)" />
+            </div>
 
-  <div>
-    <button id="runBtn">Run</button>
-    <button id="exampleBtn">Example</button>
-    <button id="clearBtn">Clear results</button>
+            <div class="field-group">
+              <label for="titleSize">Title size</label>
+              <input id="titleSize" type="number" value="20" min="6" />
+            </div>
+
+            <div class="field-group">
+              <label for="labelSize">Label size</label>
+              <input id="labelSize" type="number" value="6.5" min="4" />
+            </div>
+
+            <div class="field-group">
+              <label for="interval">Axis tick interval (bp)</label>
+              <input id="interval" type="number" value="5000" />
+            </div>
+
+            <div class="field-group">
+              <label for="truncate">Truncate long labels to this many characters</label>
+              <input id="truncate" type="number" value="20" />
+            </div>
+
+            <div class="field-group">
+              <label for="dpi">DPI (image quality)</label>
+              <input id="dpi" type="number" value="600" />
+            </div>
+
+            <div class="field-group">
+              <label for="annotations">Annotations proportion (0-1)</label>
+              <input id="annotations" type="number" min="0" max="1" step="0.05" value="1" />
+            </div>
+
+            <div class="field-group field-group--full">
+              <label for="labelIds">Label IDs (optional, newline-separated)</label>
+              <textarea id="labelIds" rows="4" placeholder="Optional list of CDS IDs to always label (one per line)"></textarea>
+            </div>
+          </div>
+
+          <div class="toggle-grid toggle-grid--two">
+            <label class="inline-toggle">
+              <input id="labelHyp" type="checkbox" />
+              <span class="inline-toggle__content">
+                <span class="inline-toggle__title">Label hypothetical proteins</span>
+              </span>
+            </label>
+
+            <label class="inline-toggle">
+              <input id="removeOther" type="checkbox" />
+              <span class="inline-toggle__content">
+                <span class="inline-toggle__title">Remove tRNA/tmRNA/CRISPR labels</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+      </section>
+
+      <div class="hero-actions reveal">
+        <button id="runBtn" class="btn btn-primary">Run</button>
+        <button id="exampleBtn" class="btn btn-secondary">Example</button>
+        <button id="clearBtn" class="btn btn-ghost">Clear results</button>
+      </div>
+      <p class="status hero-status reveal" id="status" role="status" aria-live="polite">Pyodide will be loaded on demand when you click <strong>Run</strong>.</p>
+
+      <section class="support-grid">
+        <div class="logs-card panel reveal">
+          <div class="section-header">
+            <h2>Logs</h2>
+          </div>
+          <pre id="log">(logs will appear here)</pre>
+        </div>
+      </section>
+
+      <section class="results-panel panel reveal">
+        <div class="section-header">
+          <h2>Plots</h2>
+        </div>
+        <div id="images" class="images"></div>
+      </section>
+    </main>
   </div>
-
-  <div class="status" id="status">Pyodide will be loaded on demand when you click <strong>Run</strong>.</div>
-
-  <h2>Logs</h2>
-  <pre id="log" style="height:160px; overflow:auto;">(logs will appear here)</pre>
-
-  <h2>Plots</h2>
-  <div id="images" class="images"></div>
 
   <script type="text/javascript">
     let pyodideReadyPromise = null;
@@ -145,23 +222,84 @@
     const logEl = document.getElementById("log");
     const imagesEl = document.getElementById("images");
     const fileInput = document.getElementById("fileInput");
+    const themeToggleBtn = document.getElementById("themeToggle");
+    const themeToggleIconEl = document.getElementById("themeToggleIcon");
+    const logPlaceholder = "(logs will appear here)";
+    const themeStorageKey = "phold-theme";
+    const sunIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.2"></path><path d="M12 19.3v2.2"></path><path d="M21.5 12h-2.2"></path><path d="M4.7 12H2.5"></path><path d="M18.7 5.3l-1.6 1.6"></path><path d="M6.9 17.1l-1.6 1.6"></path><path d="M18.7 18.7l-1.6-1.6"></path><path d="M6.9 6.9L5.3 5.3"></path></svg>';
+    const moonIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.3 14.8A8.7 8.7 0 0 1 9.2 3.7a8.9 8.9 0 1 0 11.1 11.1Z"></path></svg>';
+
+    function readStoredTheme() {
+      try {
+        return localStorage.getItem(themeStorageKey) || document.documentElement.dataset.theme || "dark";
+      } catch (error) {
+        return document.documentElement.dataset.theme || "dark";
+      }
+    }
+
+    function storeTheme(theme) {
+      try {
+        localStorage.setItem(themeStorageKey, theme);
+      } catch (error) {
+        // Ignore storage failures and keep the in-memory theme applied.
+      }
+    }
+
+    function applyTheme(theme) {
+      const nextTheme = theme === "light" ? "light" : "dark";
+      document.documentElement.dataset.theme = nextTheme;
+
+      const isLight = nextTheme === "light";
+      themeToggleBtn.setAttribute("aria-pressed", String(isLight));
+      themeToggleBtn.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
+      themeToggleBtn.title = isLight ? "Switch to dark mode" : "Switch to light mode";
+      themeToggleIconEl.innerHTML = isLight ? moonIcon : sunIcon;
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      const nextTheme = currentTheme === "light" ? "dark" : "light";
+      applyTheme(nextTheme);
+      storeTheme(nextTheme);
+    }
+
+    function setStatus(message, tone = "neutral") {
+      statusEl.innerHTML = message;
+    }
+
+    function setBusy(isBusy) {
+      runBtn.disabled = isBusy;
+      exampleBtn.disabled = isBusy;
+      clearBtn.disabled = isBusy;
+    }
+
+    function resetLogs() {
+      logEl.textContent = logPlaceholder;
+    }
+
+    function renderEmptyState() {
+      imagesEl.innerHTML = "";
+    }
 
     function log(msg) {
       console.log(msg);
+      if (logEl.textContent.trim() === logPlaceholder) {
+        logEl.textContent = "";
+      }
       logEl.textContent += msg + "\n";
       logEl.scrollTop = logEl.scrollHeight;
     }
 
     async function ensurePyodide() {
       if (!pyodideReadyPromise) {
-        statusEl.textContent = "Loading Pyodide… (this downloads ~ a few MB)";
+        setStatus("Loading Pyodide\u2026 (this downloads ~ a few MB)", "working");
         pyodideReadyPromise = loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.0/full/" });
       }
       return pyodideReadyPromise;
     }
 
     async function installDependencies(pyodide) {
-      statusEl.textContent = "Installing micropip + Biopython + pycirclize (may take 10–60s)...";
+      setStatus("Installing micropip + Biopython + pycirclize (may take 10\u201360s)...", "working");
       log("Installing micropip and packages. This can take a while on first run.");
       await pyodide.loadPackage("micropip");
       const micropip = pyodide.pyimport("micropip");
@@ -175,15 +313,13 @@
           log(`Error installing ${pkg}: ${err}`);
         }
       }
-      statusEl.textContent = "Dependencies installed (or attempted).";
+      setStatus("Dependencies installed (or attempted).", "working");
       log("Package installation step complete.");
     }
 
     async function runPhold(gbkText) {
-      runBtn.disabled = true;
-      exampleBtn.disabled = true;
-      clearBtn.disabled = true;
-      imagesEl.innerHTML = "";
+      setBusy(true);
+      renderEmptyState();
       logEl.textContent = "";
 
       const opts = {
@@ -211,7 +347,7 @@
       const pyodide = await ensurePyodide();
       await installDependencies(pyodide);
 
-      statusEl.textContent = "Running plotting in Pyodide (this may take a while)...";
+      setStatus("Running plotting in Pyodide (this may take a while)...", "working");
       log("Starting Python plotting...");
 
       try {
@@ -655,54 +791,67 @@
 
     out
         `);
-       const pyRet = result.toJs ? result.toJs() : result;
+        const pyRet = result.toJs ? result.toJs() : result;
         // pyRet is an object mapping filenames -> byte arrays
+        imagesEl.innerHTML = "";
         for (const [fname, pyBytes] of Object.entries(pyRet)) {
           const arr = pyBytes instanceof Uint8Array ? pyBytes : new Uint8Array(pyBytes);
           const blobType = fname.endsWith(".svg") ? "image/svg+xml" : "image/png";
           const blob = new Blob([arr], { type: blobType });
           const url = URL.createObjectURL(blob);
+          const filename = fname.split("/").pop();
 
           const card = document.createElement("div");
           card.className = "img-card";
+          const header = document.createElement("div");
+          header.className = "img-card__header";
           const title = document.createElement("div");
-          title.innerHTML = `<strong>${fname.split("/").pop()}</strong>`;
+          title.className = "img-card__title";
+          title.textContent = filename;
           const img = document.createElement("img");
           img.src = url;
+          img.alt = filename;
+          const stage = document.createElement("div");
+          stage.className = "img-stage";
+          stage.appendChild(img);
           const dlLink = document.createElement("a");
+          dlLink.className = "btn btn-primary download-link";
           dlLink.href = url;
-          dlLink.download = fname.split("/").pop();
+          dlLink.download = filename;
           dlLink.textContent = "Download";
-          dlLink.style.display = "inline-block";
-          dlLink.style.marginTop = ".5rem";
-          card.appendChild(title);
-          card.appendChild(img);
+          header.appendChild(title);
+          card.appendChild(header);
+          card.appendChild(stage);
           card.appendChild(dlLink);
           imagesEl.appendChild(card);
         }
 
-        statusEl.textContent = "Done. Images displayed below.";
+        if (imagesEl.children.length === 0) {
+          renderEmptyState();
+        }
+
+        setStatus("Done. Images displayed below.", "success");
         log("Plotting finished and images loaded.");
       } catch (err) {
         console.error(err);
         log("Error running Python: " + String(err));
-        statusEl.textContent = "Error (see logs)";
+        renderEmptyState();
+        setStatus("Error (see logs)", "error");
       } finally {
-        runBtn.disabled = false;
-        clearBtn.disabled = false;
+        setBusy(false);
       }
     }
 
 
     exampleBtn.addEventListener("click", async () => {
-      statusEl.textContent = "Loading example GBK from data/NC_043029_phold_output.gbk...";
+      setStatus("Loading example GBK from data/NC_043029_phold_output.gbk...", "working");
       try {
         const resp = await fetch("data/NC_043029_phold_output.gbk");
         const text = await resp.text();
         await runPhold(text);
       } catch (err) {
         log("Error loading example file: " + err);
-        statusEl.textContent = "Error loading example GBK";
+        setStatus("Error loading example GBK", "error");
       }
     });
 
@@ -717,10 +866,16 @@
     });
 
     clearBtn.addEventListener("click", () => {
-      imagesEl.innerHTML = "";
-      logEl.textContent = "";
-      statusEl.textContent = "Cleared.";
+      renderEmptyState();
+      resetLogs();
+      setStatus("Cleared.", "neutral");
     });
+
+    themeToggleBtn.addEventListener("click", toggleTheme);
+
+    applyTheme(readStoredTheme());
+    resetLogs();
+    renderEmptyState();
 
   </script>
 </body>
